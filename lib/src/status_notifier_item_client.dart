@@ -243,6 +243,11 @@ class _StatusNotifierItemObject extends DBusObject {
       'Menu': menu
     });
   }
+
+  Future<void> setIconName(String value) async {
+    iconName = value;
+    await emitPropertiesChanged('org.kde.StatusNotifierItem', changedProperties: {'IconName': DBusString(iconName)});
+  }
 }
 
 /// A client that registers status notifier items.
@@ -319,6 +324,8 @@ class StatusNotifierItemClient {
   Future<void> updateMenu(DBusMenuItem menu) async {
     await _menuObject.update(menu);
   }
+
+  Future<void> setIconName(String iconName) => _notifierItemObject.setIconName(iconName);
 
   /// Terminates all active connections. If a client remains unclosed, the Dart process may not terminate.
   Future<void> close() async {
