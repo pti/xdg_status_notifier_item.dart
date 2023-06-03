@@ -31,6 +31,11 @@ String _encodeStatus(StatusNotifierItemStatus value) =>
     }[value] ??
     '';
 
+const _kPropertyIconName = 'IconName';
+const _kPropertyLabel = 'XAyatanaLabel';
+const _kPropertyLabelGuide = 'XAyatanaLabelGuide';
+const _kNotificationItemInterfaceName = 'org.kde.StatusNotifierItem';
+
 class _StatusNotifierItemObject extends DBusObject {
   final StatusNotifierItemCategory category;
   final String id;
@@ -41,6 +46,8 @@ class _StatusNotifierItemObject extends DBusObject {
   String overlayIconName;
   String attentionIconName;
   String attentionMovieName;
+  String label;
+  String labelGuide;
   final DBusObjectPath menu;
   Future<void> Function(int x, int y)? onContextMenu;
   Future<void> Function(int x, int y)? onActivate;
@@ -57,6 +64,8 @@ class _StatusNotifierItemObject extends DBusObject {
       this.overlayIconName = '',
       this.attentionIconName = '',
       this.attentionMovieName = '',
+      this.label = '',
+      this.labelGuide = '',
       this.menu = DBusObjectPath.root,
       this.onContextMenu,
       this.onActivate,
@@ -107,7 +116,7 @@ class _StatusNotifierItemObject extends DBusObject {
             access: DBusPropertyAccess.read),
         DBusIntrospectProperty('WindowId', DBusSignature('i'),
             access: DBusPropertyAccess.read),
-        DBusIntrospectProperty('IconName', DBusSignature('s'),
+        DBusIntrospectProperty(_kPropertyIconName, DBusSignature('s'),
             access: DBusPropertyAccess.read),
         DBusIntrospectProperty('IconPixmap', DBusSignature('a(iiay)'),
             access: DBusPropertyAccess.read),
@@ -126,7 +135,11 @@ class _StatusNotifierItemObject extends DBusObject {
         DBusIntrospectProperty('ItemIsMenu', DBusSignature('b'),
             access: DBusPropertyAccess.read),
         DBusIntrospectProperty('Menu', DBusSignature('o'),
-            access: DBusPropertyAccess.read)
+            access: DBusPropertyAccess.read),
+        DBusIntrospectProperty(_kPropertyLabel, DBusSignature('s'),
+            access: DBusPropertyAccess.read),
+        DBusIntrospectProperty(_kPropertyLabelGuide, DBusSignature('s'),
+            access: DBusPropertyAccess.read),
       ])
     ];
   }
@@ -197,7 +210,7 @@ class _StatusNotifierItemObject extends DBusObject {
         return DBusGetPropertyResponse(DBusString(_encodeStatus(status)));
       case 'WindowId':
         return DBusGetPropertyResponse(DBusInt32(windowId));
-      case 'IconName':
+      case _kPropertyIconName:
         return DBusGetPropertyResponse(DBusString(iconName));
       case 'IconPixmap':
         return DBusGetPropertyResponse(DBusArray(DBusSignature('(iiay)'), []));
@@ -222,6 +235,10 @@ class _StatusNotifierItemObject extends DBusObject {
         return DBusGetPropertyResponse(DBusBoolean(false));
       case 'Menu':
         return DBusGetPropertyResponse(menu);
+      case _kPropertyLabel:
+        return DBusGetPropertyResponse(DBusString(label));
+      case _kPropertyLabelGuide:
+        return DBusGetPropertyResponse(DBusString(labelGuide));
       default:
         return DBusMethodErrorResponse.unknownProperty();
     }
@@ -235,18 +252,29 @@ class _StatusNotifierItemObject extends DBusObject {
       'Title': DBusString(title),
       'Status': DBusString(_encodeStatus(status)),
       'WindowId': DBusInt32(windowId),
-      'IconName': DBusString(iconName),
+      _kPropertyIconName: DBusString(iconName),
       'OverlayIconName': DBusString(overlayIconName),
       'AttentionIconName': DBusString(attentionIconName),
       'AttentionMovieName': DBusString(attentionMovieName),
       'ItemIsMenu': DBusBoolean(false),
+      _kPropertyLabel: DBusString(label),
+      _kPropertyLabelGuide: DBusString(labelGuide),
       'Menu': menu
     });
   }
 
   Future<void> setIconName(String value) async {
     iconName = value;
-    await emitPropertiesChanged('org.kde.StatusNotifierItem', changedProperties: {'IconName': DBusString(iconName)});
+    await emitPropertiesChanged(_kNotificationItemInterfaceName, changedProperties: {_kPropertyIconName: DBusString(iconName)});
+  }
+
+  Future<void> setLabel(String label, [String guide = '']) async {
+    label = label;
+    labelGuide = guide;
+    await emitPropertiesChanged(_kNotificationItemInterfaceName, changedProperties: {
+      _kPropertyLabel: DBusString(label),
+      _kPropertyLabelGuide: DBusString(labelGuide),
+    });
   }
 }
 
@@ -272,6 +300,8 @@ class StatusNotifierItemClient {
       String overlayIconName = '',
       String attentionIconName = '',
       String attentionMovieName = '',
+      String label = '',
+      String labelGuide = '',
       required DBusMenuItem menu,
       Future<void> Function(int x, int y)? onContextMenu,
       Future<void> Function(int x, int y)? onActivate,
@@ -291,6 +321,8 @@ class StatusNotifierItemClient {
         overlayIconName: overlayIconName,
         attentionIconName: attentionIconName,
         attentionMovieName: attentionMovieName,
+        label: label,
+        labelGuide: labelGuide,
         menu: _menuObject.path,
         onContextMenu: onContextMenu,
         onActivate: onActivate,
@@ -326,6 +358,8 @@ class StatusNotifierItemClient {
   }
 
   Future<void> setIconName(String iconName) => _notifierItemObject.setIconName(iconName);
+
+  Future<void> setLabel(String label, [String guide = '']) => _notifierItemObject.setLabel(label, guide);
 
   /// Terminates all active connections. If a client remains unclosed, the Dart process may not terminate.
   Future<void> close() async {
