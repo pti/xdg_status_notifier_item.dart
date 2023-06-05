@@ -76,7 +76,7 @@ class _StatusNotifierItemObject extends DBusObject {
   @override
   List<DBusIntrospectInterface> introspect() {
     return [
-      DBusIntrospectInterface('org.freedesktop.StatusNotifierItem', methods: [
+      DBusIntrospectInterface(_kNotificationItemInterfaceName, methods: [
         DBusIntrospectMethod('ContextMenu', args: [
           DBusIntrospectArgument(DBusSignature('i'), DBusArgumentDirection.in_,
               name: 'x'),
@@ -146,7 +146,7 @@ class _StatusNotifierItemObject extends DBusObject {
 
   @override
   Future<DBusMethodResponse> handleMethodCall(DBusMethodCall methodCall) async {
-    if (methodCall.interface != 'org.freedesktop.StatusNotifierItem') {
+    if (methodCall.interface != _kNotificationItemInterfaceName) {
       return DBusMethodErrorResponse.unknownInterface();
     }
 
@@ -195,7 +195,7 @@ class _StatusNotifierItemObject extends DBusObject {
 
   @override
   Future<DBusMethodResponse> getProperty(String interface, String name) async {
-    if (interface != 'org.freedesktop.StatusNotifierItem') {
+    if (interface != _kNotificationItemInterfaceName) {
       return DBusMethodErrorResponse.unknownProperty();
     }
 
