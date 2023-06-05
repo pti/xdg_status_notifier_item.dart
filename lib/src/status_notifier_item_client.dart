@@ -264,6 +264,7 @@ class _StatusNotifierItemObject extends DBusObject {
   }
 
   Future<void> setIconName(String value) async {
+    if (value == iconName) return;
     iconName = value;
     await emitPropertiesChanged(_kNotificationItemInterfaceName, changedProperties: {_kPropertyIconName: DBusString(iconName)});
   }
