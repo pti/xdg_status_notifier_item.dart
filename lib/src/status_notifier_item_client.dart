@@ -269,6 +269,7 @@ class _StatusNotifierItemObject extends DBusObject {
   }
 
   Future<void> setLabel(String label, [String guide = '']) async {
+    if (label == this.label && labelGuide == guide) return;
     this.label = label;
     labelGuide = guide;
     await emitPropertiesChanged(_kNotificationItemInterfaceName, changedProperties: {
