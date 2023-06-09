@@ -156,7 +156,7 @@ class _StatusNotifierItemObject extends DBusObject {
           return DBusMethodErrorResponse.invalidArgs();
         }
         var x = methodCall.values[0].asInt32();
-        var y = methodCall.values[0].asInt32();
+        var y = methodCall.values[1].asInt32();
         await onContextMenu?.call(x, y);
         return DBusMethodSuccessResponse();
       case 'Activate':
@@ -164,7 +164,7 @@ class _StatusNotifierItemObject extends DBusObject {
           return DBusMethodErrorResponse.invalidArgs();
         }
         var x = methodCall.values[0].asInt32();
-        var y = methodCall.values[0].asInt32();
+        var y = methodCall.values[1].asInt32();
         await onActivate?.call(x, y);
         return DBusMethodSuccessResponse();
       case 'SecondaryActivate':
@@ -172,7 +172,7 @@ class _StatusNotifierItemObject extends DBusObject {
           return DBusMethodErrorResponse.invalidArgs();
         }
         var x = methodCall.values[0].asInt32();
-        var y = methodCall.values[0].asInt32();
+        var y = methodCall.values[1].asInt32();
         await onSecondaryActivate?.call(x, y);
         return DBusMethodSuccessResponse();
       case 'Scroll':
@@ -180,7 +180,7 @@ class _StatusNotifierItemObject extends DBusObject {
           return DBusMethodErrorResponse.invalidArgs();
         }
         var delta = methodCall.values[0].asInt32();
-        var orientation = methodCall.values[0].asString();
+        var orientation = methodCall.values[1].asString();
         await onScroll?.call(delta, orientation);
         return DBusMethodSuccessResponse();
       case 'ProvideXdgActivationToken':
